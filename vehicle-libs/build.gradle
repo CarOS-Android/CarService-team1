@@ -33,6 +33,11 @@ android {
             options.bootstrapClasspath = files(newFileList.toArray())
         }
     }
+    sourceSets {
+        main {
+            aidl.srcDirs = ['src/main/java']
+        }
+    }
 
 }
 

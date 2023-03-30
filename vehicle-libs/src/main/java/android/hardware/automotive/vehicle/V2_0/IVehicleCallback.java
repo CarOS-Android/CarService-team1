@@ -432,7 +432,7 @@ public interface IVehicleCallback extends android.hidl.base.V1_0.IBase {
         }
 
         @Override
-        public final boolean linkToDeath(android.os.IHwBinder.DeathRecipient recipient, long cookie) {
+        public final boolean linkToDeath(DeathRecipient recipient, long cookie) {
             return true;
 
         }
@@ -460,7 +460,7 @@ public interface IVehicleCallback extends android.hidl.base.V1_0.IBase {
         }
 
         @Override
-        public final boolean unlinkToDeath(android.os.IHwBinder.DeathRecipient recipient) {
+        public final boolean unlinkToDeath(DeathRecipient recipient) {
             return true;
 
         }

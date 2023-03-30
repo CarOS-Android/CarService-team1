@@ -1,15 +1,18 @@
-package android.hardware.automotive.vehicle.V2_0;
+package android.hardware.automotive.audiocontrol.V1_0;
 
-public interface IVehicle extends android.hidl.base.V1_0.IBase {
+/**
+ * Interacts with the car's audio subsystem to manage audio sources and volumes
+ */
+public interface IAudioControl extends android.hidl.base.V1_0.IBase {
     /**
      * Fully-qualified interface name for this interface.
      */
-    public static final String kInterfaceName = "android.hardware.automotive.vehicle@2.0::IVehicle";
+    public static final String kInterfaceName = "android.hardware.automotive.audiocontrol@1.0::IAudioControl";
 
     /**
      * Does a checked conversion from a binder to this class.
      */
-    /* package private */ static IVehicle asInterface(android.os.IHwBinder binder) {
+    /* package private */ static IAudioControl asInterface(android.os.IHwBinder binder) {
         if (binder == null) {
             return null;
         }
@@ -17,11 +20,11 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
         android.os.IHwInterface iface =
                 binder.queryLocalInterface(kInterfaceName);
 
-        if ((iface != null) && (iface instanceof IVehicle)) {
-            return (IVehicle)iface;
+        if ((iface != null) && (iface instanceof IAudioControl)) {
+            return (IAudioControl)iface;
         }
 
-        IVehicle proxy = new Proxy(binder);
+        IAudioControl proxy = new Proxy(binder);
 
         try {
             for (String descriptor : proxy.interfaceChain()) {
@@ -38,8 +41,8 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
     /**
      * Does a checked conversion from any interface to this class.
      */
-    public static IVehicle castFrom(android.os.IHwInterface iface) {
-        return (iface == null) ? null : IVehicle.asInterface(iface.asBinder());
+    public static IAudioControl castFrom(android.os.IHwInterface iface) {
+        return (iface == null) ? null : IAudioControl.asInterface(iface.asBinder());
     }
 
     @Override
@@ -51,14 +54,14 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
      * available on the device and retry is true, this will wait for the service to
      * start. Otherwise, it will return immediately even if the service is null.
      */
-    public static IVehicle getService(String serviceName, boolean retry) throws android.os.RemoteException {
-        return IVehicle.asInterface(android.os.HwBinder.getService("android.hardware.automotive.vehicle@2.0::IVehicle", serviceName, retry));
+    public static IAudioControl getService(String serviceName, boolean retry) throws android.os.RemoteException {
+        return IAudioControl.asInterface(android.os.HwBinder.getService("android.hardware.automotive.audiocontrol@1.0::IAudioControl", serviceName, retry));
     }
 
     /**
      * Calls getService("default",retry).
      */
-    public static IVehicle getService(boolean retry) throws android.os.RemoteException {
+    public static IAudioControl getService(boolean retry) throws android.os.RemoteException {
         return getService("default", retry);
     }
 
@@ -66,107 +69,53 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
      * Warning: this will not wait for the interface to come up if it hasn't yet
      * started. See getService(String,boolean) instead.
      */
-    public static IVehicle getService(String serviceName) throws android.os.RemoteException {
-        return IVehicle.asInterface(android.os.HwBinder.getService("android.hardware.automotive.vehicle@2.0::IVehicle", serviceName));
+    public static IAudioControl getService(String serviceName) throws android.os.RemoteException {
+        return IAudioControl.asInterface(android.os.HwBinder.getService("android.hardware.automotive.audiocontrol@1.0::IAudioControl", serviceName));
     }
 
     /**
      * Warning: this will not wait for the interface to come up if it hasn't yet started. See getService(String,boolean) instead.
      */
-    public static IVehicle getService() throws android.os.RemoteException {
+    public static IAudioControl getService() throws android.os.RemoteException {
         return getService("default");
     }
 
     /**
-     * Returns a list of all property configurations supported by this vehicle
-     * HAL.
+     * Called at startup once per context to get the mapping from ContextNumber to
+     * busAddress. This lets the car tell the framework to which physical output stream
+     * each context should be routed.
+     *
+     * For every context, a valid bus number (0 - num busses-1) must be returned. If an
+     * unrecognized contextNumber is encountered, then -1 shall be returned.
+     *
+     * Deprecated: usage of this API and car_volume_groups.xml has been replaced with
+     * car_audio_configuration.xml. If using car_audio_configuration.xml, then the framework
+     * will not call this method. If it doesn't, then it will load car_volume_groups.xml and
+     * call this method.
      */
-    java.util.ArrayList<VehiclePropConfig> getAllPropConfigs()
-        throws android.os.RemoteException;
-
-    @FunctionalInterface
-    public interface getPropConfigsCallback {
-        public void onValues(int status, java.util.ArrayList<VehiclePropConfig> propConfigs);
-    }
-
-    /**
-     * Returns a list of property configurations for given properties.
-     *
-     * If requested VehicleProperty wasn't found it must return
-     * StatusCode::INVALID_ARG, otherwise a list of vehicle property
-     * configurations with StatusCode::OK
-     */
-    void getPropConfigs(java.util.ArrayList<Integer> props, getPropConfigsCallback _hidl_cb)
-        throws android.os.RemoteException;
-
-    @FunctionalInterface
-    public interface getCallback {
-        public void onValues(int status, VehiclePropValue propValue);
-    }
-
-    /**
-     * Get a vehicle property value.
-     *
-     * For VehiclePropertyChangeMode::STATIC properties, this method must always
-     * return the same value always.
-     * For VehiclePropertyChangeMode::ON_CHANGE properties, it must return the
-     * latest available value.
-     *
-     * Some properties like RADIO_PRESET requires to pass additional data in
-     * GET request in VehiclePropValue object.
-     *
-     * If there is no data available yet, which can happen during initial stage,
-     * this call must return immediately with an error code of
-     * StatusCode::TRY_AGAIN.
-     */
-    void get(VehiclePropValue requestedPropValue, getCallback _hidl_cb)
+    int getBusForContext(int contextNumber)
         throws android.os.RemoteException;
     /**
-     * Set a vehicle property value.
+     * Control the right/left balance setting of the car speakers.
      *
-     * Timestamp of data must be ignored for set operation.
+     * This is intended to shift the speaker volume toward the right (+) or left (-) side of
+     * the car. 0.0 means "centered". +1.0 means fully right. -1.0 means fully left.
      *
-     * Setting some properties require having initial state available. If initial
-     * data is not available yet this call must return StatusCode::TRY_AGAIN.
-     * For a property with separate power control this call must return
-     * StatusCode::NOT_AVAILABLE error if property is not powered on.
+     * A value outside the range -1 to 1 must be clamped by the implementation to the -1 to 1
+     * range.
      */
-    int set(VehiclePropValue propValue)
+    void setBalanceTowardRight(float value)
         throws android.os.RemoteException;
     /**
-     * Subscribes to property events.
+     * Control the fore/aft fade setting of the car speakers.
      *
-     * Clients must be able to subscribe to multiple properties at a time
-     * depending on data provided in options argument.
+     * This is intended to shift the speaker volume toward the front (+) or back (-) of the car.
+     * 0.0 means "centered". +1.0 means fully forward. -1.0 means fully rearward.
      *
-     * @param listener This client must be called on appropriate event.
-     * @param options List of options to subscribe. SubscribeOption contains
-     *                information such as property Id, area Id, sample rate, etc.
+     * A value outside the range -1 to 1 must be clamped by the implementation to the -1 to 1
+     * range.
      */
-    int subscribe(IVehicleCallback callback, java.util.ArrayList<SubscribeOptions> options)
-        throws android.os.RemoteException;
-    /**
-     * Unsubscribes from property events.
-     *
-     * If this client wasn't subscribed to the given property, this method
-     * must return StatusCode::INVALID_ARG.
-     */
-    int unsubscribe(IVehicleCallback callback, int propId)
-        throws android.os.RemoteException;
-    /**
-     * Print out debugging state for the vehicle hal.
-     *
-     * The text must be in ASCII encoding only.
-     *
-     * Performance requirements:
-     *
-     * The HAL must return from this call in less than 10ms. This call must avoid
-     * deadlocks, as it may be called at any point of operation. Any synchronization
-     * primitives used (such as mutex locks or semaphores) must be acquired
-     * with a timeout.
-     *
-     */
-    String debugDump()
+    void setFadeTowardFront(float value)
         throws android.os.RemoteException;
     java.util.ArrayList<String> interfaceChain()
         throws android.os.RemoteException;
@@ -189,7 +138,7 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
     boolean unlinkToDeath(android.os.IHwBinder.DeathRecipient recipient)
         throws android.os.RemoteException;
 
-    public static final class Proxy implements IVehicle {
+    public static final class Proxy implements IAudioControl {
         private android.os.IHwBinder mRemote;
 
         public Proxy(android.os.IHwBinder remote) {
@@ -208,7 +157,7 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
             } catch (android.os.RemoteException ex) {
                 /* ignored; handled below. */
             }
-            return "[class or subclass of " + IVehicle.kInterfaceName + "]@Proxy";
+            return "[class or subclass of " + IAudioControl.kInterfaceName + "]@Proxy";
         }
 
         @Override
@@ -221,145 +170,54 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
             return this.asBinder().hashCode();
         }
 
-        // Methods from ::android::hardware::automotive::vehicle::V2_0::IVehicle follow.
+        // Methods from ::android::hardware::automotive::audiocontrol::V1_0::IAudioControl follow.
         @Override
-        public java.util.ArrayList<VehiclePropConfig> getAllPropConfigs()
+        public int getBusForContext(int contextNumber)
                 throws android.os.RemoteException {
             android.os.HwParcel _hidl_request = new android.os.HwParcel();
-            _hidl_request.writeInterfaceToken(IVehicle.kInterfaceName);
+            _hidl_request.writeInterfaceToken(IAudioControl.kInterfaceName);
+            _hidl_request.writeInt32(contextNumber);
 
             android.os.HwParcel _hidl_reply = new android.os.HwParcel();
             try {
-                mRemote.transact(1 /* getAllPropConfigs */, _hidl_request, _hidl_reply, 0 /* flags */);
+                mRemote.transact(1 /* getBusForContext */, _hidl_request, _hidl_reply, 0 /* flags */);
                 _hidl_reply.verifySuccess();
                 _hidl_request.releaseTemporaryStorage();
 
-                java.util.ArrayList<VehiclePropConfig> _hidl_out_propConfigs = VehiclePropConfig.readVectorFromParcel(_hidl_reply);
-                return _hidl_out_propConfigs;
+                int _hidl_out_busNumber = _hidl_reply.readInt32();
+                return _hidl_out_busNumber;
             } finally {
                 _hidl_reply.release();
             }
         }
 
         @Override
-        public void getPropConfigs(java.util.ArrayList<Integer> props, getPropConfigsCallback _hidl_cb)
+        public void setBalanceTowardRight(float value)
                 throws android.os.RemoteException {
             android.os.HwParcel _hidl_request = new android.os.HwParcel();
-            _hidl_request.writeInterfaceToken(IVehicle.kInterfaceName);
-            _hidl_request.writeInt32Vector(props);
+            _hidl_request.writeInterfaceToken(IAudioControl.kInterfaceName);
+            _hidl_request.writeFloat(value);
 
             android.os.HwParcel _hidl_reply = new android.os.HwParcel();
             try {
-                mRemote.transact(2 /* getPropConfigs */, _hidl_request, _hidl_reply, 0 /* flags */);
-                _hidl_reply.verifySuccess();
+                mRemote.transact(2 /* setBalanceTowardRight */, _hidl_request, _hidl_reply, 1 /* oneway */);
                 _hidl_request.releaseTemporaryStorage();
-
-                int _hidl_out_status = _hidl_reply.readInt32();
-                java.util.ArrayList<VehiclePropConfig> _hidl_out_propConfigs = VehiclePropConfig.readVectorFromParcel(_hidl_reply);
-                _hidl_cb.onValues(_hidl_out_status, _hidl_out_propConfigs);
             } finally {
                 _hidl_reply.release();
             }
         }
 
         @Override
-        public void get(VehiclePropValue requestedPropValue, getCallback _hidl_cb)
+        public void setFadeTowardFront(float value)
                 throws android.os.RemoteException {
             android.os.HwParcel _hidl_request = new android.os.HwParcel();
-            _hidl_request.writeInterfaceToken(IVehicle.kInterfaceName);
-            ((VehiclePropValue) requestedPropValue).writeToParcel(_hidl_request);
+            _hidl_request.writeInterfaceToken(IAudioControl.kInterfaceName);
+            _hidl_request.writeFloat(value);
 
             android.os.HwParcel _hidl_reply = new android.os.HwParcel();
             try {
-                mRemote.transact(3 /* get */, _hidl_request, _hidl_reply, 0 /* flags */);
-                _hidl_reply.verifySuccess();
+                mRemote.transact(3 /* setFadeTowardFront */, _hidl_request, _hidl_reply, 1 /* oneway */);
                 _hidl_request.releaseTemporaryStorage();
-
-                int _hidl_out_status = _hidl_reply.readInt32();
-                VehiclePropValue _hidl_out_propValue = new VehiclePropValue();
-                ((VehiclePropValue) _hidl_out_propValue).readFromParcel(_hidl_reply);
-                _hidl_cb.onValues(_hidl_out_status, _hidl_out_propValue);
-            } finally {
-                _hidl_reply.release();
-            }
-        }
-
-        @Override
-        public int set(VehiclePropValue propValue)
-                throws android.os.RemoteException {
-            android.os.HwParcel _hidl_request = new android.os.HwParcel();
-            _hidl_request.writeInterfaceToken(IVehicle.kInterfaceName);
-            ((VehiclePropValue) propValue).writeToParcel(_hidl_request);
-
-            android.os.HwParcel _hidl_reply = new android.os.HwParcel();
-            try {
-                mRemote.transact(4 /* set */, _hidl_request, _hidl_reply, 0 /* flags */);
-                _hidl_reply.verifySuccess();
-                _hidl_request.releaseTemporaryStorage();
-
-                int _hidl_out_status = _hidl_reply.readInt32();
-                return _hidl_out_status;
-            } finally {
-                _hidl_reply.release();
-            }
-        }
-
-        @Override
-        public int subscribe(IVehicleCallback callback, java.util.ArrayList<SubscribeOptions> options)
-                throws android.os.RemoteException {
-            android.os.HwParcel _hidl_request = new android.os.HwParcel();
-            _hidl_request.writeInterfaceToken(IVehicle.kInterfaceName);
-            _hidl_request.writeStrongBinder(callback == null ? null : callback.asBinder());
-            SubscribeOptions.writeVectorToParcel(_hidl_request, options);
-
-            android.os.HwParcel _hidl_reply = new android.os.HwParcel();
-            try {
-                mRemote.transact(5 /* subscribe */, _hidl_request, _hidl_reply, 0 /* flags */);
-                _hidl_reply.verifySuccess();
-                _hidl_request.releaseTemporaryStorage();
-
-                int _hidl_out_status = _hidl_reply.readInt32();
-                return _hidl_out_status;
-            } finally {
-                _hidl_reply.release();
-            }
-        }
-
-        @Override
-        public int unsubscribe(IVehicleCallback callback, int propId)
-                throws android.os.RemoteException {
-            android.os.HwParcel _hidl_request = new android.os.HwParcel();
-            _hidl_request.writeInterfaceToken(IVehicle.kInterfaceName);
-            _hidl_request.writeStrongBinder(callback == null ? null : callback.asBinder());
-            _hidl_request.writeInt32(propId);
-
-            android.os.HwParcel _hidl_reply = new android.os.HwParcel();
-            try {
-                mRemote.transact(6 /* unsubscribe */, _hidl_request, _hidl_reply, 0 /* flags */);
-                _hidl_reply.verifySuccess();
-                _hidl_request.releaseTemporaryStorage();
-
-                int _hidl_out_status = _hidl_reply.readInt32();
-                return _hidl_out_status;
-            } finally {
-                _hidl_reply.release();
-            }
-        }
-
-        @Override
-        public String debugDump()
-                throws android.os.RemoteException {
-            android.os.HwParcel _hidl_request = new android.os.HwParcel();
-            _hidl_request.writeInterfaceToken(IVehicle.kInterfaceName);
-
-            android.os.HwParcel _hidl_reply = new android.os.HwParcel();
-            try {
-                mRemote.transact(7 /* debugDump */, _hidl_request, _hidl_reply, 0 /* flags */);
-                _hidl_reply.verifySuccess();
-                _hidl_request.releaseTemporaryStorage();
-
-                String _hidl_out_s = _hidl_reply.readString();
-                return _hidl_out_s;
             } finally {
                 _hidl_reply.release();
             }
@@ -539,7 +397,7 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
         }
     }
 
-    public static abstract class Stub extends android.os.HwBinder implements IVehicle {
+    public static abstract class Stub extends android.os.HwBinder implements IAudioControl {
         @Override
         public android.os.IHwBinder asBinder() {
             return this;
@@ -548,7 +406,7 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
         @Override
         public final java.util.ArrayList<String> interfaceChain() {
             return new java.util.ArrayList<String>(java.util.Arrays.asList(
-                    IVehicle.kInterfaceName,
+                    IAudioControl.kInterfaceName,
                     android.hidl.base.V1_0.IBase.kInterfaceName));
 
         }
@@ -561,14 +419,14 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
 
         @Override
         public final String interfaceDescriptor() {
-            return IVehicle.kInterfaceName;
+            return IAudioControl.kInterfaceName;
 
         }
 
         @Override
         public final java.util.ArrayList<byte[/* 32 */]> getHashChain() {
             return new java.util.ArrayList<byte[/* 32 */]>(java.util.Arrays.asList(
-                    new byte[/* 32 */]{-77,-54,-11,36,-60,106,71,-42,126,100,83,-93,68,25,-31,-120,25,66,-48,89,-31,70,-51,-89,64,80,38,112,-23,-89,82,-61} /* b3caf524c46a47d67e6453a34419e1881942d059e146cda740502670e9a752c3 */,
+                    new byte[/* 32 */]{-61,-20,24,44,-29,37,-122,43,125,121,-27,38,-13,-31,112,-64,44,-2,-31,73,126,-45,9,-41,-58,13,13,-28,-54,99,107,11} /* c3ec182ce325862b7d79e526f3e170c02cfee1497ed309d7c60d0de4ca636b0b */,
                     new byte[/* 32 */]{-20,127,-41,-98,-48,45,-6,-123,-68,73,-108,38,-83,-82,62,-66,35,-17,5,36,-13,-51,105,87,19,-109,36,-72,59,24,-54,76} /* ec7fd79ed02dfa85bc499426adae3ebe23ef0524f3cd6957139324b83b18ca4c */));
 
         }
@@ -633,132 +491,48 @@ public interface IVehicle extends android.hidl.base.V1_0.IBase {
         public void onTransact(int _hidl_code, android.os.HwParcel _hidl_request, final android.os.HwParcel _hidl_reply, int _hidl_flags)
                 throws android.os.RemoteException {
             switch (_hidl_code) {
-                case 1 /* getAllPropConfigs */:
+                case 1 /* getBusForContext */:
                 {
                     boolean _hidl_is_oneway = (_hidl_flags & 1 /* oneway */) != 0;
                     if (_hidl_is_oneway != false) {
                         _hidl_reply.writeStatus(-2147483648);
                         _hidl_reply.send();
                         break;
-                    }_hidl_request.enforceInterface(IVehicle.kInterfaceName);
+                    }_hidl_request.enforceInterface(IAudioControl.kInterfaceName);
 
-                    java.util.ArrayList<VehiclePropConfig> _hidl_out_propConfigs = getAllPropConfigs();
+                    int contextNumber = _hidl_request.readInt32();
+                    int _hidl_out_busNumber = getBusForContext(contextNumber);
                     _hidl_reply.writeStatus(android.os.HwParcel.STATUS_SUCCESS);
-                    VehiclePropConfig.writeVectorToParcel(_hidl_reply, _hidl_out_propConfigs);
+                    _hidl_reply.writeInt32(_hidl_out_busNumber);
                     _hidl_reply.send();
                     break;
                 }
 
-                case 2 /* getPropConfigs */:
+                case 2 /* setBalanceTowardRight */:
                 {
                     boolean _hidl_is_oneway = (_hidl_flags & 1 /* oneway */) != 0;
-                    if (_hidl_is_oneway != false) {
+                    if (_hidl_is_oneway != true) {
                         _hidl_reply.writeStatus(-2147483648);
                         _hidl_reply.send();
                         break;
-                    }_hidl_request.enforceInterface(IVehicle.kInterfaceName);
+                    }_hidl_request.enforceInterface(IAudioControl.kInterfaceName);
 
-                    java.util.ArrayList<Integer> props = _hidl_request.readInt32Vector();
-                    getPropConfigs(props, new getPropConfigsCallback() {
-                        @Override
-                        public void onValues(int status, java.util.ArrayList<VehiclePropConfig> propConfigs) {
-                            _hidl_reply.writeStatus(android.os.HwParcel.STATUS_SUCCESS);
-                            _hidl_reply.writeInt32(status);
-                            VehiclePropConfig.writeVectorToParcel(_hidl_reply, propConfigs);
-                            _hidl_reply.send();
-                            }});
+                    float value = _hidl_request.readFloat();
+                    setBalanceTowardRight(value);
                     break;
                 }
 
-                case 3 /* get */:
+                case 3 /* setFadeTowardFront */:
                 {
                     boolean _hidl_is_oneway = (_hidl_flags & 1 /* oneway */) != 0;
-                    if (_hidl_is_oneway != false) {
+                    if (_hidl_is_oneway != true) {
                         _hidl_reply.writeStatus(-2147483648);
                         _hidl_reply.send();
                         break;
-                    }_hidl_request.enforceInterface(IVehicle.kInterfaceName);
+                    }_hidl_request.enforceInterface(IAudioControl.kInterfaceName);
 
-                    VehiclePropValue requestedPropValue = new VehiclePropValue();
-                    ((VehiclePropValue) requestedPropValue).readFromParcel(_hidl_request);
-                    get(requestedPropValue, new getCallback() {
-                        @Override
-                        public void onValues(int status, VehiclePropValue propValue) {
-                            _hidl_reply.writeStatus(android.os.HwParcel.STATUS_SUCCESS);
-                            _hidl_reply.writeInt32(status);
-                            ((VehiclePropValue) propValue).writeToParcel(_hidl_reply);
-                            _hidl_reply.send();
-                            }});
-                    break;
-                }
-
-                case 4 /* set */:
-                {
-                    boolean _hidl_is_oneway = (_hidl_flags & 1 /* oneway */) != 0;
-                    if (_hidl_is_oneway != false) {
-                        _hidl_reply.writeStatus(-2147483648);
-                        _hidl_reply.send();
-                        break;
-                    }_hidl_request.enforceInterface(IVehicle.kInterfaceName);
-
-                    VehiclePropValue propValue = new VehiclePropValue();
-                    ((VehiclePropValue) propValue).readFromParcel(_hidl_request);
-                    int _hidl_out_status = set(propValue);
-                    _hidl_reply.writeStatus(android.os.HwParcel.STATUS_SUCCESS);
-                    _hidl_reply.writeInt32(_hidl_out_status);
-                    _hidl_reply.send();
-                    break;
-                }
-
-                case 5 /* subscribe */:
-                {
-                    boolean _hidl_is_oneway = (_hidl_flags & 1 /* oneway */) != 0;
-                    if (_hidl_is_oneway != false) {
-                        _hidl_reply.writeStatus(-2147483648);
-                        _hidl_reply.send();
-                        break;
-                    }_hidl_request.enforceInterface(IVehicle.kInterfaceName);
-
-                    IVehicleCallback callback = IVehicleCallback.asInterface(_hidl_request.readStrongBinder());
-                    java.util.ArrayList<SubscribeOptions> options = SubscribeOptions.readVectorFromParcel(_hidl_request);
-                    int _hidl_out_status = subscribe(callback, options);
-                    _hidl_reply.writeStatus(android.os.HwParcel.STATUS_SUCCESS);
-                    _hidl_reply.writeInt32(_hidl_out_status);
-                    _hidl_reply.send();
-                    break;
-                }
-
-                case 6 /* unsubscribe */:
-                {
-                    boolean _hidl_is_oneway = (_hidl_flags & 1 /* oneway */) != 0;
-                    if (_hidl_is_oneway != false) {
-                        _hidl_reply.writeStatus(-2147483648);
-                        _hidl_reply.send();
-                        break;
-                    }_hidl_request.enforceInterface(IVehicle.kInterfaceName);
-
-                    IVehicleCallback callback = IVehicleCallback.asInterface(_hidl_request.readStrongBinder());
-                    int propId = _hidl_request.readInt32();
-                    int _hidl_out_status = unsubscribe(callback, propId);
-                    _hidl_reply.writeStatus(android.os.HwParcel.STATUS_SUCCESS);
-                    _hidl_reply.writeInt32(_hidl_out_status);
-                    _hidl_reply.send();
-                    break;
-                }
-
-                case 7 /* debugDump */:
-                {
-                    boolean _hidl_is_oneway = (_hidl_flags & 1 /* oneway */) != 0;
-                    if (_hidl_is_oneway != false) {
-                        _hidl_reply.writeStatus(-2147483648);
-                        _hidl_reply.send();
-                        break;
-                    }_hidl_request.enforceInterface(IVehicle.kInterfaceName);
-
-                    String _hidl_out_s = debugDump();
-                    _hidl_reply.writeStatus(android.os.HwParcel.STATUS_SUCCESS);
-                    _hidl_reply.writeString(_hidl_out_s);
-                    _hidl_reply.send();
+                    float value = _hidl_request.readFloat();
+                    setFadeTowardFront(value);
                     break;
                 }
 

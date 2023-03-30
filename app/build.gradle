@@ -48,7 +48,9 @@ dependencies {
     compileOnly files("${rootProject.projectDir}/libs/framework-wifi.jar")
     compileOnly files("${rootProject.projectDir}/libs/services.jar")
     compileOnly files("${rootProject.projectDir}/libs/core-libart.jar")
-    compileOnly files("${rootProject.projectDir}/libs/android.car.cluster.navigation.jar")
+    compileOnly files("${rootProject.projectDir}/libs/android.hardware.automotive.audiocontrol-V2-java.jar")
+    compileOnly files("${rootProject.projectDir}/libs/android.automotive.watchdog.internal-V2-java.jar")
+    compileOnly files("${rootProject.projectDir}/libs/CarServiceUpdatable.jar")
 
     implementation project(':car-builtin-lib')
     implementation project(':vehicle-libs')
