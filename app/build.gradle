@@ -48,6 +48,7 @@ dependencies {
     compileOnly files("${rootProject.projectDir}/libs/framework-wifi.jar")
     compileOnly files("${rootProject.projectDir}/libs/services.jar")
     compileOnly files("${rootProject.projectDir}/libs/core-libart.jar")
+    compileOnly files("${rootProject.projectDir}/libs/android.car.cluster.navigation.jar")
 
     implementation project(':car-builtin-lib')
     implementation project(':vehicle-libs')
