@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.carservice'
+    namespace 'com.android.car'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.carservice"
+        applicationId "com.android.car"
         minSdk 28
         targetSdk 33
         versionCode 1
@@ -23,6 +23,12 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFileName = "TwCarService.apk"
+        }
+    }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -33,7 +39,7 @@ android {
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
             Set<File> fileSet = options.bootstrapClasspath.getFiles()
-            List<File> newFileList = new ArrayList<>();
+            List<File> newFileList = new ArrayList<>()
             newFileList.add(new File('../libs/framework.jar'))
             newFileList.add(new File('../libs/framework-bluetooth.jar'))
             newFileList.add(new File('../libs/framework-wifi.jar'))
