@@ -24,15 +24,6 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
-    gradle.projectsEvaluated {
-        tasks.withType(JavaCompile) {
-            Set<File> fileSet = options.bootstrapClasspath.getFiles()
-            List<File> newFileList = new ArrayList<>();
-            newFileList.add(new File('../libs/framework.jar'))
-            newFileList.addAll(fileSet)
-            options.bootstrapClasspath = files(newFileList.toArray())
-        }
-    }
     sourceSets {
         main {
             aidl.srcDirs = ['src/main/java']

@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'com.example.car_builtin_lib'
+    namespace 'android.car.builtin'
     compileSdk 33
 
     defaultConfig {
@@ -43,7 +43,6 @@ android {
 
 dependencies {
     compileOnly files("${rootProject.projectDir}/libs/framework.jar")
-    compileOnly files("${rootProject.projectDir}/libs/services.jar")
     compileOnly files("${rootProject.projectDir}/libs/framework-bluetooth.jar")
     compileOnly files("${rootProject.projectDir}/libs/core-libart.jar")
 
