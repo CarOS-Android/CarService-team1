@@ -131,25 +131,11 @@ public final class ExperimentalCarUserManager extends CarManagerBase {
     @RequiresPermission(android.Manifest.permission.MANAGE_USERS)
     @AddedInOrBefore(majorVersion = 33)
     public AndroidFuture<UserSwitchResult> switchDriver(@UserIdInt int driverId) {
-        try {
-            AndroidFuture<UserSwitchResult> future = new AndroidFuture<UserSwitchResult>() {
-                @Override
-                protected void onCompleted(UserSwitchResult result, Throwable err) {
-                    if (result == null) {
-                        Log.w(TAG, "switchDriver(" + driverId + ") failed: " + err);
-                    }
-                    super.onCompleted(result, err);
-                }
-            };
-            mService.switchDriver(driverId, future);
-            return future;
-        } catch (RemoteException e) {
-            AndroidFuture<UserSwitchResult> future = new AndroidFuture<>();
-            future.complete(
-                    new UserSwitchResult(UserSwitchResult.STATUS_HAL_INTERNAL_FAILURE, null));
-            handleRemoteExceptionFromCarService(e);
-            return future;
-        }
+        AndroidFuture<UserSwitchResult> future = new AndroidFuture<>();
+        future.complete(
+                new UserSwitchResult(UserSwitchResult.STATUS_HAL_INTERNAL_FAILURE, null));
+        handleRemoteExceptionFromCarService(new RemoteException("Disable switch Driver"));
+        return future;
     }
 
     /**
