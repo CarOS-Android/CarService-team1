@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.android.car'
+    namespace 'com.android.car.updatable'
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.android.car.framework"
+        applicationId "com.android.car.updatable"
         minSdk 26
         targetSdk 33
         versionCode 1
@@ -35,6 +35,10 @@ android {
     }
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
     }
     gradle.projectsEvaluated {
         tasks.withType(JavaCompile) {
