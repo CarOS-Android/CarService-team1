@@ -8,7 +8,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.android.car"
+        applicationId "com.android.car.framework"
         minSdk 26
         targetSdk 33
         versionCode 1
