@@ -14,8 +14,8 @@ dependencyResolutionManagement {
 }
 rootProject.name = "CarService"
 include ':app'
+include ':car-service'
 include ':car-builtin-lib'
 include ':vehicle-libs'
 include ':car-lib'
 include ':procfs-inspector'
-include ':service-builtin'

@@ -1,0 +1,69 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    namespace 'com.android.car.updatable'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 26
+        targetSdk 33
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+    lintOptions {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+    gradle.projectsEvaluated {
+        tasks.withType(JavaCompile) {
+            Set<File> fileSet = options.bootstrapClasspath.getFiles()
+            List<File> newFileList = new ArrayList<>()
+            newFileList.add(new File('../libs/framework.jar'))
+            newFileList.add(new File('../libs/framework-bluetooth.jar'))
+            newFileList.add(new File('../libs/framework-wifi.jar'))
+            newFileList.add(new File('../libs/framework-connectivity-t.jar'))
+            newFileList.addAll(fileSet)
+            options.bootstrapClasspath = files(newFileList.toArray())
+        }
+    }
+
+}
+
+dependencies {
+    compileOnly files("${rootProject.projectDir}/libs/framework.jar")
+    compileOnly files("${rootProject.projectDir}/libs/framework-wifi.jar")
+    compileOnly files("${rootProject.projectDir}/libs/framework-statsd.jar")
+    compileOnly files("${rootProject.projectDir}/libs/framework-connectivity-t.jar")
+    compileOnly files("${rootProject.projectDir}/libs/core-libart.jar")
+    compileOnly files("${rootProject.projectDir}/libs/android.hardware.automotive.audiocontrol-V2-java.jar")
+    compileOnly files("${rootProject.projectDir}/libs/android.automotive.watchdog.internal-V2-java.jar")
+    compileOnly files("${rootProject.projectDir}/libs/android.hardware.automotive.occupant_awareness-V1-java.jar")
+    compileOnly files("${rootProject.projectDir}/libs/android.automotive.telemetry.internal-V2-java.jar")
+    compileOnly files("${rootProject.projectDir}/libs/CarServiceUpdatable.jar")
+
+    implementation project(':car-builtin-lib')
+    implementation project(':vehicle-libs')
+    implementation project(':car-lib')
+    implementation project(':procfs-inspector')
+
+    testImplementation 'junit:junit:4.13.2'
+}
