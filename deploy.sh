@@ -14,7 +14,8 @@ adb remount
 
 # 4. remove origin carservice
 adb shell "rm -r system/priv-app/CarService/CarService.apk"
-adb shell "rm -r system/priv-app/CarService/ota"
+adb shell "rm -r system/priv-app/CarService/TwCarService.apk"
+adb shell "rm -r system/priv-app/CarService/oat"
 
 # 5. push the apk file to system directory
 adb push app/build/outputs/apk/debug/TwCarService.apk system/priv-app/CarService
