@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'com.google.protobuf'
+    id 'maven-publish'
 }
 
 protobuf {
@@ -39,6 +40,8 @@ android {
     defaultConfig {
         minSdk 26
         targetSdk 33
+        versionCode 1
+        versionName "1.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -88,4 +91,25 @@ dependencies {
     implementation project(':car-builtin-lib')
 
     api 'com.google.protobuf:protobuf-lite:3.0.1'
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId 'com.thoughtworks.automotive.team1'
+            artifactId 'carlib'
+            version android.defaultConfig.versionName
+            artifact("$buildDir/outputs/aar/car-lib-release.aar")
+        }
+    }
+    repositories {
+        maven {
+            credentials {
+                username "jiemeng"
+                password "Test123"
+            }
+            url "http://10.205.215.4:8081/repository/maven-releases/"
+            allowInsecureProtocol = true
+        }
+    }
 }
