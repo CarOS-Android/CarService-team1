@@ -34,6 +34,9 @@ public final class PropertyPermissionMapping {
     public PropertyPermissionMapping() {
         // Add propertyId and read/write permissions
         // Cabin Properties
+        map(Car.PERMISSION_CAR_FRAGRANCE,
+                VehiclePropertyIds.FRAGRANCE_SWITCH,
+                VehiclePropertyIds.FRAGRANCE_LEVEL);
         map(Car.PERMISSION_CONTROL_CAR_DOORS,
                 VehiclePropertyIds.DOOR_POS,
                 VehiclePropertyIds.DOOR_MOVE,

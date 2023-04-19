@@ -2,6 +2,7 @@
  * This file is auto-generated.  DO NOT MODIFY.
  */
 package android.hardware.automotive.vehicle;
+
 public @interface VehicleProperty {
   public static final int INVALID = 0;
   public static final int INFO_VIN = 286261504;
@@ -175,4 +176,6 @@ public @interface VehicleProperty {
   public static final int EV_REGENERATIVE_BRAKING_STATE = 289410884;
   public static final int TRAILER_PRESENT = 289410885;
   public static final int VEHICLE_CURB_WEIGHT = 289410886;
+  public static final int FRAGRANCE_SWITCH = 287313736;
+  public static final int FRAGRANCE_LEVEL = 356519753;
 }

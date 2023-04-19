@@ -172,6 +172,12 @@ public class PropertyHalServiceIds {
         mPropToValidBitFlag = new HashMap<>();
         // Add propertyId and read/write permissions
         // Cabin Properties
+        mProps.put(VehicleProperty.FRAGRANCE_SWITCH, new Pair<>(
+                Car.PERMISSION_CAR_FRAGRANCE,
+                Car.PERMISSION_CAR_FRAGRANCE));
+        mProps.put(VehicleProperty.FRAGRANCE_LEVEL, new Pair<>(
+                Car.PERMISSION_CAR_FRAGRANCE,
+                Car.PERMISSION_CAR_FRAGRANCE));
         mProps.put(VehicleProperty.DOOR_POS, new Pair<>(
                 Car.PERMISSION_CONTROL_CAR_DOORS,
                 Car.PERMISSION_CONTROL_CAR_DOORS));
