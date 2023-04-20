@@ -2229,11 +2229,11 @@ public final class VehiclePropertyIds {
     public static final int VEHICLE_CURB_WEIGHT = 289410886;
 
     // fragrance
-    @RequiresPermission.Read(@RequiresPermission(Car.PERMISSION_CAR_FRAGRANCE))
+    @RequiresPermission(Car.PERMISSION_CAR_FRAGRANCE)
     @AddedInOrBefore(majorVersion = 33)
     public static final int FRAGRANCE_SWITCH = 287313736;
 
-    @RequiresPermission.Read(@RequiresPermission(Car.PERMISSION_CAR_FRAGRANCE))
+    @RequiresPermission(Car.PERMISSION_CAR_FRAGRANCE)
     @AddedInOrBefore(majorVersion = 33)
     public static final int FRAGRANCE_LEVEL = 356519753;
 
